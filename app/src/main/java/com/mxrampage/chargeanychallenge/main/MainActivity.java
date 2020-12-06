@@ -1,6 +1,7 @@
 package com.mxrampage.chargeanychallenge.main;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,37 +15,50 @@ import com.mxrampage.chargeanychallenge.R;
 import com.mxrampage.chargeanychallenge.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-    private ActivityMainBinding activityMainBinding;
-    private MainActivityViewModel mainActivityViewModel;
-    private EntriesAdapter adapter;
+    private ActivityMainBinding mActivityMainBinding;
+    private MainActivityViewModel mMainActivityViewModel;
+    private EntriesAdapter mEntriesAdapter;
+    private final Handler mAutoEntriesCreatorHandler = new Handler();
+    private Runnable mAutoEntriesCreatorRunnable;
+
+    private static final int ONE_MINUTE = 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        mainActivityViewModel = new ViewModelProvider(this,
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mMainActivityViewModel = new ViewModelProvider(this,
                 ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication()))
                 .get(MainActivityViewModel.class);
-        activityMainBinding.setMainActivityViewModel(mainActivityViewModel);
-        activityMainBinding.setLifecycleOwner(this);
+        mActivityMainBinding.setMainActivityViewModel(mMainActivityViewModel);
+        mActivityMainBinding.setLifecycleOwner(this);
         initializeEntriesAdapterAndSetInRecyclerView();
-        initializeFAB();
         setupLiveDataObserverToUpdateAdapter();
     }
 
     private void initializeEntriesAdapterAndSetInRecyclerView() {
-        adapter = new EntriesAdapter(new EntriesAdapter.EntriesDiffCallback());
-        activityMainBinding.recyclerview.setAdapter(adapter);
-    }
-
-    private void initializeFAB() {
-        activityMainBinding.floatingActionButton.setOnClickListener(v ->
-                mainActivityViewModel.insert());
+        mEntriesAdapter = new EntriesAdapter(new EntriesAdapter.EntriesDiffCallback());
+        mActivityMainBinding.recyclerview.setAdapter(mEntriesAdapter);
     }
 
     private void setupLiveDataObserverToUpdateAdapter() {
-        mainActivityViewModel.mEntriesLiveData.observe(this, entries ->
-                adapter.submitList(entries));
+        mMainActivityViewModel.mEntriesLiveData.observe(this, entries ->
+                mEntriesAdapter.submitList(entries));
+    }
+
+    @Override
+    protected void onResume() {
+        mAutoEntriesCreatorHandler.postDelayed(mAutoEntriesCreatorRunnable = () -> {
+            mAutoEntriesCreatorHandler.postDelayed(mAutoEntriesCreatorRunnable, ONE_MINUTE);
+            mMainActivityViewModel.insert();
+        }, ONE_MINUTE);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mAutoEntriesCreatorHandler.removeCallbacks(mAutoEntriesCreatorRunnable);
+        super.onPause();
     }
 
     @Override
@@ -57,13 +71,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sort_by_id) {
-            mainActivityViewModel.getEntriesSortedByType("key");
+            mMainActivityViewModel.getEntriesSortedByType("key");
             return true;
         } else if (item.getItemId() == R.id.sort_by_word) {
-            mainActivityViewModel.getEntriesSortedByType("word");
+            mMainActivityViewModel.getEntriesSortedByType("word");
             return true;
         } else if (item.getItemId() == R.id.sort_by_date) {
-            mainActivityViewModel.getEntriesSortedByType("date");
+            mMainActivityViewModel.getEntriesSortedByType("date");
             return true;
         } else {
             return super.onOptionsItemSelected(item);
