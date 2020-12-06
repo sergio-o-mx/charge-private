@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">ChargeAnyChallenge</string>
+
+    <!-- Defaults used to display info in layout -->
+    <string name="sample_id">ID: 1</string>
+    <string name="sample_word">Hello World!</string>
+    <string name="sample_date">Created at: 12–05–2020 18:43</string>
+
+    <!-- Sorting types -->
+    <string name="sort_by_id">Sort by ID</string>
+    <string name="sort_by_word">Sort by Word</string>
+    <string name="sort_by_date">Sort by Date</string>
+
+</resources>
