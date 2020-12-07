@@ -72,12 +72,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sort_by_id) {
             mMainActivityViewModel.getEntriesSortedByType("key");
+            mActivityMainBinding.recyclerview.smoothScrollToPosition(
+                    mActivityMainBinding.recyclerview.getAdapter().getItemCount() - 1);
             return true;
         } else if (item.getItemId() == R.id.sort_by_word) {
             mMainActivityViewModel.getEntriesSortedByType("word");
+            mActivityMainBinding.recyclerview.smoothScrollToPosition(0);
             return true;
         } else if (item.getItemId() == R.id.sort_by_date) {
             mMainActivityViewModel.getEntriesSortedByType("date");
+            mActivityMainBinding.recyclerview.smoothScrollToPosition(0);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
