@@ -6,12 +6,16 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-public class Utils {
+public class EntryGeneratorUtils {
     private static final int CHARACTER_LOWER_LIMIT = 97;
     private static final int CHARACTER_UPPER_LIMIT = 122;
     private static final int STRING_LENGTH = 10;
 
-    public static String generateRandomStringForEntryName() {
+    public EntryGeneratorUtils() {
+
+    }
+
+    public final String generateRandomStringForEntryName() {
         Random random = new Random();
         StringBuilder randomEntryBuilder = new StringBuilder(STRING_LENGTH);
         for (int i = 0; i < STRING_LENGTH; i++) {
@@ -22,7 +26,7 @@ public class Utils {
         return randomEntryBuilder.toString();
     }
 
-    public static String generateDateStringForEntryDate() {
+    public final String generateDateStringForEntryDate() {
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
         return dateFormat.format(date);

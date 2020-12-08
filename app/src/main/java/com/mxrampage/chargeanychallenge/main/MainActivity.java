@@ -14,6 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.mxrampage.chargeanychallenge.R;
 import com.mxrampage.chargeanychallenge.databinding.ActivityMainBinding;
 
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mActivityMainBinding;
     private MainActivityViewModel mMainActivityViewModel;
@@ -21,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private final Handler mAutoEntriesCreatorHandler = new Handler();
     private Runnable mAutoEntriesCreatorRunnable;
 
-    private static final int ONE_MINUTE = 60 * 1000;
+    private static final long ONE_MINUTE = TimeUnit.SECONDS.toMillis(60);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,20 +74,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sort_by_id) {
-            mMainActivityViewModel.getEntriesSortedByType("key");
-            mActivityMainBinding.recyclerview.smoothScrollToPosition(
-                    mActivityMainBinding.recyclerview.getAdapter().getItemCount() - 1);
+            sortEntriesAndScrollTo("key",
+                    Objects.requireNonNull(mActivityMainBinding.recyclerview.getAdapter()).getItemCount() - 1);
             return true;
         } else if (item.getItemId() == R.id.sort_by_word) {
-            mMainActivityViewModel.getEntriesSortedByType("word");
-            mActivityMainBinding.recyclerview.smoothScrollToPosition(0);
+            sortEntriesAndScrollTo("word", 0);
             return true;
         } else if (item.getItemId() == R.id.sort_by_date) {
-            mMainActivityViewModel.getEntriesSortedByType("date");
-            mActivityMainBinding.recyclerview.smoothScrollToPosition(0);
+            sortEntriesAndScrollTo("date", 0);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void sortEntriesAndScrollTo(String type, int position) {
+        mMainActivityViewModel.getEntriesSortedBy(type);
+        mActivityMainBinding.recyclerview.smoothScrollToPosition(position);
     }
 }
